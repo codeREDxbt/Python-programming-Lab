@@ -161,34 +161,34 @@ def compute_statistics(df: pd.DataFrame, mapping: Dict[str, Optional[str]]) -> D
     # Daily (as-is)
     daily = {}
     if temp and temp in df.columns:
-        daily["temperature"] = df[[temp]].groupby(df.index.date).agg(_agg)
+        daily["temperature"] = df[temp].groupby(df.index.date).apply(_agg)
     if rain and rain in df.columns:
-        daily["rainfall"] = df[[rain]].groupby(df.index.date).agg(_agg)
+        daily["rainfall"] = df[rain].groupby(df.index.date).apply(_agg)
     if hum and hum in df.columns:
-        daily["humidity"] = df[[hum]].groupby(df.index.date).agg(_agg)
+        daily["humidity"] = df[hum].groupby(df.index.date).apply(_agg)
     if daily:
         stats["daily"] = {k: v for k, v in daily.items()}
 
     # Monthly
     monthly = {}
     if temp and temp in df.columns:
-        monthly["temperature"] = df[temp].resample("M").apply(_agg)
+        monthly["temperature"] = df[temp].resample("ME").apply(_agg)
     if rain and rain in df.columns:
         # For rainfall, monthly total is useful; still provide stats
-        monthly["rainfall"] = df[rain].resample("M").apply(_agg)
+        monthly["rainfall"] = df[rain].resample("ME").apply(_agg)
     if hum and hum in df.columns:
-        monthly["humidity"] = df[hum].resample("M").apply(_agg)
+        monthly["humidity"] = df[hum].resample("ME").apply(_agg)
     if monthly:
         stats["monthly"] = {k: v for k, v in monthly.items()}
 
     # Yearly
     yearly = {}
     if temp and temp in df.columns:
-        yearly["temperature"] = df[temp].resample("Y").apply(_agg)
+        yearly["temperature"] = df[temp].resample("YE").apply(_agg)
     if rain and rain in df.columns:
-        yearly["rainfall"] = df[rain].resample("Y").apply(_agg)
+        yearly["rainfall"] = df[rain].resample("YE").apply(_agg)
     if hum and hum in df.columns:
-        yearly["humidity"] = df[hum].resample("Y").apply(_agg)
+        yearly["humidity"] = df[hum].resample("YE").apply(_agg)
     if yearly:
         stats["yearly"] = {k: v for k, v in yearly.items()}
 
@@ -220,7 +220,7 @@ def plot_monthly_rainfall(df: pd.DataFrame, rain_col: Optional[str], outdir: Pat
     if not rain_col or rain_col not in df.columns:
         logging.warning("Rainfall column not found; skipping monthly rainfall plot.")
         return None
-    monthly = df[rain_col].resample("M").sum(min_count=1)
+    monthly = df[rain_col].resample("ME").sum(min_count=1)
     fig, ax = plt.subplots(figsize=(10, 4))
     monthly.plot(kind="bar", ax=ax, color="tab:blue")
     ax.set_title("Monthly Rainfall Totals")
@@ -256,8 +256,8 @@ def plot_combo(df: pd.DataFrame, temp_col: Optional[str], rain_col: Optional[str
     if not temp_col or temp_col not in df.columns or not rain_col or rain_col not in df.columns:
         logging.warning("Temperature or Rainfall column not found; skipping combo figure.")
         return None
-    monthly_rain = df[rain_col].resample("M").sum(min_count=1)
-    monthly_temp = df[temp_col].resample("M").mean()
+    monthly_rain = df[rain_col].resample("ME").sum(min_count=1)
+    monthly_temp = df[temp_col].resample("ME").mean()
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
     monthly_temp.plot(ax=axes[0], color="tab:red")
