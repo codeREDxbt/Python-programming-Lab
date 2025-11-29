@@ -2,13 +2,6 @@
 Capstone Project: Campus Energy-Use Dashboard
 Author: Vinayak [2501730150]
 Course: Programming for Problem Solving using Python
-
-Features:
-- Ingests multiple CSVs from /data/ directory
-- OOP Design: Building, MeterReading, BuildingManager
-- Aggregates daily/weekly consumption
-- Visualizes trends (Line, Bar, Scatter) in a dashboard
-- Exports cleaned data and summary report
 """
 
 import os
